@@ -1,0 +1,23 @@
+{
+  "name": "@mie-js/core",
+  "version": "0.0.0",
+  "description": "Core of mie",
+  "keywords": [
+    "mie",
+    "miejs"
+  ],
+  "author": "hakuna-tata <610578197@qq.com>",
+  "homepage": "https://github.com/hakuna-tata/make-isomorphy-easy#readme",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "lib"
+  ],
+  "scripts": {
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "typescript": "^4.2.4"
+  }
+}

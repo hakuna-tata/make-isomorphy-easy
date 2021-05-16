@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+      "target": "esnext",
+      "moduleResolution": "node",
+      "module": "commonjs",
+      "declaration": true,
+      "esModuleInterop": true,
+      "allowSyntheticDefaultImports": true,
+  },
+  "exclude": [
+    "node_modules"
+  ]
+}
