@@ -1,0 +1,21 @@
+{
+  "root": true,
+  "env": {
+      "browser": true,
+      "node": true
+  },
+  "extends": [
+      "plugin:@typescript-eslint/recommended"
+  ],
+  "parserOptions": {
+      "parser": "@typescript-eslint/parser",
+      "sourceType": "module",
+      "ecmaVersion": 2018
+  },
+  "rules": {
+    "@typescript-eslint/no-empty-function": "off",
+    "no-var": "error",
+    "no-console": "error",
+    "no-empty": "error"
+  }
+}
