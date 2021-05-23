@@ -15,6 +15,7 @@
     "lib"
   ],
   "scripts": {
+    "dev": "tsc --watch",
     "build": "tsc"
   },
   "devDependencies": {
