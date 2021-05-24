@@ -1,5 +1,3 @@
-const testServer = (a: number, b: number) : number => {
-  return a + b;
-}
+export * from './optTypes';
 
-export default testServer;
+export { default } from './mie';
