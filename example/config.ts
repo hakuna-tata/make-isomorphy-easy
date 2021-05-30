@@ -1,9 +1,11 @@
+import { join } from 'path';
 import { MieOpts } from '@mie-js/core'
 
 export const config: MieOpts = {
   pages: [
     {
-      page: '',
+      pageDir: join(__dirname, 'vue2'),
+      route: 'vue2',
       dist: ''
     }
   ],

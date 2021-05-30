@@ -2,7 +2,12 @@ export interface PageConfig {
   /**
    * 页面路径
    */
-  page: string;
+  pageDir: string;
+
+  /**
+   * 页面路由
+   */
+  route: string;
 
   /**
    * 构建产物目录 (优先级高)
