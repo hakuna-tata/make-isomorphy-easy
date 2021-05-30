@@ -1,3 +1,3 @@
 export * from './optTypes';
 
-export { default } from './mie';
+export { mie as default } from './mie';
