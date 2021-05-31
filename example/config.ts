@@ -6,7 +6,8 @@ export const config: MieOpts = {
     {
       pageDir: join(__dirname, 'vue2'),
       route: 'vue2',
-      dist: ''
+      dist: join(__dirname, 'dist'),
+      template: join(__dirname, 'vue2/static/index.html'),
     }
   ],
   dist: '',
