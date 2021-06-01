@@ -5,12 +5,12 @@ import { PageConfig, MieOpts } from './mieTypes';
 // 保留目录名
 const preserveDirs = ['components', 'assets', 'layout', 'utils', 'static', 'services'];
 
-export const scanPages = (opts: MieOpts): Required<PageConfig>[] => {
-  const page: Required<PageConfig>[] = [];
+export const getPageConfig = (opts: MieOpts): Required<PageConfig>[] => {
+  const pageConfigList: Required<PageConfig>[] = [];
   const { pages = [] } = opts;
 
   pages.forEach(pageConfig => {
-    const { pageDir, route = '', dist = '', template = '' } = pageConfig;
+    const { pageDir, Render, route = '', dist = '', template = '' } = pageConfig;
 
     const connector = route.match(/\/$/) ? '' : '/';
 
@@ -22,8 +22,9 @@ export const scanPages = (opts: MieOpts): Required<PageConfig>[] => {
         })
         .forEach(sub => {
           const pageRoute = `${(route[0] === '/' ? route : `/${route}`)}${connector}${sub.name}`;
-          page.push({
+          pageConfigList.push({
             pageDir: join(pageDir, sub.name),
+            Render,
             route: pageRoute,
             dist: dist || opts.dist,
             template: template || opts.template,
@@ -32,5 +33,21 @@ export const scanPages = (opts: MieOpts): Required<PageConfig>[] => {
     }
   })
 
-  return page;
+  return pageConfigList;
+}
+
+export const matchPage = (pageConfigList: Required<PageConfig>[], currentRoute: string)
+  : Required<PageConfig> | void => {
+     /**
+     * 兼容当前路由为 / 情况，默认匹配到 /index
+     */
+    if(currentRoute === '/') {
+      currentRoute = `${currentRoute}index`;
+    }
+
+    const targetPage = pageConfigList.find(pageConfig => {
+      return new RegExp(`^${pageConfig.route}\\b\\/?`).exec(currentRoute);
+    })
+
+    return targetPage;
 }

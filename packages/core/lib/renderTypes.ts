@@ -1,28 +1,15 @@
+import { PageConfig } from './mieTypes';
+
 export interface RenderOpts {
   /**
    * 是否为开发模式，默认 false
    */
-  dev: string;
+  dev: boolean;
 
   /**
-   * 页面路径
+   * 页面配置
    */
-  pageDir: string;
-
-  /**
-   * 构建产物目录
-   */
-  dist: string
-
-  /**
-   * 页面路由
-   */
-  route: string;
-
-  /**
-   * 渲染模板
-   */
-  template: string
+  pageConfig: Required<PageConfig>;
 }
 
 export interface RenderInstance {
@@ -31,19 +18,19 @@ export interface RenderInstance {
    */
   options: RenderOpts;
 
-  render(context: never): Promise<string>;
+  render(context): Promise<string>;
 }
 
 export interface RenderStatic {
   /**
    * 渲染器类型
    */
-  type: string;
+  // type: string;
 
   /**
    * 构建器
    */
-  packer: string;
+  // packer: string;
 
   /**
    * 构造函数

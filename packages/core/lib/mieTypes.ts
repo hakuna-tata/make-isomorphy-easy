@@ -1,6 +1,8 @@
+import { RenderStatic } from './renderTypes';
+
 export interface PageConfig {
   /**
-   * 页面路径
+   * 页面所在目录
    */
   pageDir: string;
 
@@ -8,6 +10,11 @@ export interface PageConfig {
    * 页面路由
    */
   route: string;
+
+   /**
+   * 页面需要的渲染器
+   */
+  Render: RenderStatic;
 
   /**
    * 构建产物目录 (优先级高)

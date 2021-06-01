@@ -16,5 +16,12 @@
   },
   "bugs": {
     "url": "https://github.com/hakuna-tata/make-isomorphy-easy/issues"
+  },
+  "scripts": {
+    "dev": "tsc --watch",
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "typescript": "^4.2.4"
   }
 }
