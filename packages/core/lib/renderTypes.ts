@@ -25,12 +25,12 @@ export interface RenderStatic {
   /**
    * 渲染器类型
    */
-  // type: string;
+  type: string;
 
   /**
    * 构建器
    */
-  // packer: string;
+  packer: string;
 
   /**
    * 构造函数

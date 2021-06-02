@@ -1,7 +1,7 @@
 import { BaseContext, Middleware } from 'koa';
 import { MieOpts } from './mieTypes';
 import { getPageConfig, matchPage } from './page';
-import { render } from './render';
+import { initRender } from './render';
 
 export const mie = (opts: MieOpts) : Middleware => {
   const { pages = [], dev = false } = opts;
@@ -18,7 +18,7 @@ export const mie = (opts: MieOpts) : Middleware => {
 
       if (isMethodMatched && targetPage) {
         try {
-          ctx.body = await render(ctx, { dev, pageConfig: targetPage });
+          ctx.body = await initRender(ctx, { dev, pageConfig: targetPage });
         } catch(e) {
           ctx.status = 500;
           ctx.body = 'internal error';

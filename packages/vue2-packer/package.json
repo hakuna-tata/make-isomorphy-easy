@@ -1,15 +1,18 @@
 {
-  "name": "@mie-js/vue2-render",
+  "name": "@mie-js/vue2-packer",
   "version": "0.0.0",
-  "description": "The Vue2 render for mie",
+  "description": "The Vue2 packer for mie",
   "keywords": [
-    "render"
+    "packer"
   ],
   "author": "hakuna-tata <610578197@qq.com>",
   "homepage": "https://github.com/hakuna-tata/make-isomorphy-easy#readme",
   "license": "MIT",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "files": [
+    "lib"
+  ],
   "scripts": {
     "dev": "tsc --watch",
     "build": "tsc"
