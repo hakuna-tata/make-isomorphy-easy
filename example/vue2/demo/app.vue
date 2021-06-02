@@ -1,0 +1,20 @@
+<template>
+  <div class="demo">{{ demo }}</div>
+</template>
+
+<script>
+import Vue from "vue";
+
+export default Vue.extend({
+  data() {
+    return { demo: "demo page" };
+  },
+});
+</script>
+
+<style scoped>
+  .demo {
+    font-size: 16px;
+    color: #c09;
+  }
+</style>
