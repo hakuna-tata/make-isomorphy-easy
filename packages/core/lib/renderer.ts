@@ -1,15 +1,15 @@
 import { BaseContext } from 'koa';
-import { RenderOpts, RenderInstance } from './renderTypes';
+import { RendererOpts, RendererInstance } from './rendererTypes';
 
 const renderCache: {
-  [key: string]: RenderInstance
+  [key: string]: RendererInstance
 } = {};
 
-export const initRender = async (ctx: BaseContext, opts: RenderOpts): Promise<string> => {
+export const initRender = async (ctx: BaseContext, opts: RendererOpts): Promise<string> => {
   const { pageConfig } = opts;
   if (renderCache[pageConfig.route] === undefined) {
     try {
-      const renderInstance = new pageConfig.Render(opts);
+      const renderInstance = new pageConfig.Renderer(opts);
 
       renderCache[pageConfig.route] = renderInstance;
     } catch (error) {

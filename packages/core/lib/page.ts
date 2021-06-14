@@ -10,7 +10,7 @@ export const getPageConfig = (opts: MieOpts): Required<PageConfig>[] => {
   const { pages = [] } = opts;
 
   pages.forEach(pageConfig => {
-    const { pageDir, Render, route = '', dist = '', template = '' } = pageConfig;
+    const { pageDir, Renderer, route = '', dist = '', template = '' } = pageConfig;
 
     const connector = route.match(/\/$/) ? '' : '/';
 
@@ -24,7 +24,7 @@ export const getPageConfig = (opts: MieOpts): Required<PageConfig>[] => {
           const pageRoute = `${(route[0] === '/' ? route : `/${route}`)}${connector}${sub.name}`;
           pageConfigList.push({
             pageDir: join(pageDir, sub.name),
-            Render,
+            Renderer,
             route: pageRoute,
             dist: dist || opts.dist,
             template: template || opts.template,

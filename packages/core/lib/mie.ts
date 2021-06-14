@@ -1,7 +1,7 @@
 import { BaseContext, Middleware } from 'koa';
 import { MieOpts } from './mieTypes';
 import { getPageConfig, matchPage } from './page';
-import { initRender } from './render';
+import { initRender } from './renderer';
 
 export const mie = (opts: MieOpts) : Middleware => {
   const { pages = [], dev = false } = opts;

@@ -1,6 +1,6 @@
 import { PageConfig } from './mieTypes';
 
-export interface RenderOpts {
+export interface RendererOpts {
   /**
    * 是否为开发模式，默认 false
    */
@@ -12,16 +12,16 @@ export interface RenderOpts {
   pageConfig: Required<PageConfig>;
 }
 
-export interface RenderInstance {
+export interface RendererInstance {
   /**
    * 渲染器配置
    */
-  options: RenderOpts;
+  options: RendererOpts;
 
   render(context): Promise<string>;
 }
 
-export interface RenderStatic {
+export interface RendererStatic {
   /**
    * 渲染器类型
    */
@@ -35,5 +35,5 @@ export interface RenderStatic {
   /**
    * 构造函数
    */
-  new(options: RenderOpts): RenderInstance;
+  new(options: RendererOpts): RendererInstance;
 }

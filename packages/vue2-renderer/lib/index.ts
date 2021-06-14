@@ -1,13 +1,13 @@
 import { BaseContext } from 'koa';
-import { RenderOpts, RenderInstance }  from '@mie-js/core';
+import { RendererOpts, RendererInstance }  from '@mie-js/core';
 
-export class Render implements RenderInstance {
+export class Renderer implements RendererInstance {
   static type = '@mie-js/vue2-render';
   static packer = '@mie-js/vue2-packer';
 
-  public options: RenderOpts;
+  public options: RendererOpts;
 
-  constructor(options: RenderOpts) {
+  constructor(options: RendererOpts) {
     this.options = options;
   }
 

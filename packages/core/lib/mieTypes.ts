@@ -1,4 +1,4 @@
-import { RenderStatic } from './renderTypes';
+import { RendererStatic } from './rendererTypes';
 
 export interface PageConfig {
   /**
@@ -14,7 +14,7 @@ export interface PageConfig {
    /**
    * 页面需要的渲染器
    */
-  Render: RenderStatic;
+  Renderer: RendererStatic;
 
   /**
    * 构建产物目录 (优先级高)

@@ -1,7 +1,7 @@
 {
-  "name": "@mie-js/vue2-render",
+  "name": "@mie-js/vue2-renderer",
   "version": "0.0.0",
-  "description": "The Vue2 render for mie",
+  "description": "The Vue2 renderer for mie",
   "keywords": [
     "render"
   ],

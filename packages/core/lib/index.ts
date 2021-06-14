@@ -1,4 +1,4 @@
 export * from './mieTypes';
-export * from './renderTypes';
+export * from './rendererTypes';
 
 export { mie as default } from './mie';
