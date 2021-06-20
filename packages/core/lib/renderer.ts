@@ -7,6 +7,7 @@ const renderCache: {
 
 export const initRender = async (ctx: BaseContext, opts: RendererOpts): Promise<string> => {
   const { pageConfig } = opts;
+
   if (renderCache[pageConfig.route] === undefined) {
     try {
       const renderInstance = new pageConfig.Renderer(opts);

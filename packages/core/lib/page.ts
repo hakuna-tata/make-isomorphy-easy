@@ -1,4 +1,4 @@
-import { statSync, readdirSync } from 'fs';
+import { statSync, readdirSync, readFileSync } from 'fs';
 import { join } from 'path';
 import { PageConfig, MieOpts } from './mieTypes';
 
@@ -10,7 +10,7 @@ export const getPageConfig = (opts: MieOpts): Required<PageConfig>[] => {
   const { pages = [] } = opts;
 
   pages.forEach(pageConfig => {
-    const { pageDir, Renderer, route = '', dist = '', template = '' } = pageConfig;
+    const { pageDir, Renderer, route = '', template = '' } = pageConfig;
 
     const connector = route.match(/\/$/) ? '' : '/';
 
@@ -22,12 +22,12 @@ export const getPageConfig = (opts: MieOpts): Required<PageConfig>[] => {
         })
         .forEach(sub => {
           const pageRoute = `${(route[0] === '/' ? route : `/${route}`)}${connector}${sub.name}`;
+
           pageConfigList.push({
             pageDir: join(pageDir, sub.name),
-            Renderer,
             route: pageRoute,
-            dist: dist || opts.dist,
-            template: template || opts.template,
+            Renderer,
+            template: template ? readFileSync(template, 'utf-8') : '',
           })
         })
     }

@@ -6,6 +6,11 @@ export interface RendererOpts {
    */
   dev: boolean;
 
+   /**
+   * 构建目录
+   */
+  dist: string;
+
   /**
    * 页面配置
    */

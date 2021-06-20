@@ -8,10 +8,9 @@ export const config: MieOpts = {
       pageDir: join(__dirname, 'vue2'),
       route: 'vue2',
       Renderer: Vue2Renderer,
-      dist: join(__dirname, 'dist'),
       template: join(__dirname, 'vue2/static/index.html'),
     }
   ],
-  dist: '',
   dev: true,
+  dist: join(__dirname, 'dist'),
 }

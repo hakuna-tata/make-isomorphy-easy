@@ -17,14 +17,9 @@ export interface PageConfig {
   Renderer: RendererStatic;
 
   /**
-   * 构建产物目录 (优先级高)
+   * 自定义渲染模版
    */
-  dist?: string
-
-  /**
-   * 渲染模板 (优先级高)
-   */
-  template?: string
+   template?: string;
 }
 
 export interface MieOpts {
@@ -44,9 +39,4 @@ export interface MieOpts {
    * 构建产物的 publicPath，默认: /dist/
    */
   publicPath?: string;
-
-  /**
-   * 渲染模板
-   */
-  template?: string
 }

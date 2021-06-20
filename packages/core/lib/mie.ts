@@ -4,7 +4,7 @@ import { getPageConfig, matchPage } from './page';
 import { initRender } from './renderer';
 
 export const mie = (opts: MieOpts) : Middleware => {
-  const { pages = [], dev = false } = opts;
+  const { pages = [], dev = false, dist = '' } = opts;
   if (Array.isArray(pages) && pages.length) {
     const pageRouteList = getPageConfig(opts);
 
@@ -18,7 +18,7 @@ export const mie = (opts: MieOpts) : Middleware => {
 
       if (isMethodMatched && targetPage) {
         try {
-          ctx.body = await initRender(ctx, { dev, pageConfig: targetPage });
+          ctx.body = await initRender(ctx, { dev, dist, pageConfig: targetPage });
         } catch(e) {
           ctx.status = 500;
           ctx.body = 'internal error';
