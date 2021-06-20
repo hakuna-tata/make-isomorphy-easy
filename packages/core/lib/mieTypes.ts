@@ -19,7 +19,7 @@ export interface PageConfig {
   /**
    * 自定义渲染模版
    */
-   template?: string;
+  template?: string;
 }
 
 export interface MieOpts {

@@ -1,6 +1,14 @@
 import { WebpackOptions } from 'webpack/declarations/WebpackOptions';
 import VueLoaderPlugin from 'vue-loader/lib/plugin';
 
+export interface ExternalConfig {
+  mode: 'development' | 'production';
+  entry: string;
+  dist: string;
+  onProgress: (percentage: number, message: string) => void;
+}
+
+
 export const base: WebpackOptions = {
   resolve: {
     extensions: ['js', 'vue', 'ts', 'json'],
