@@ -1,8 +1,10 @@
 import { join } from 'path';
 import { existsSync, mkdirSync } from 'fs';
 import { PageConfig } from '@mie-js/core';
-import { WebpackOptions } from 'webpack/declarations/WebpackOptions';
 import { BundleRenderer } from 'vue-server-renderer';
+import clone from 'clone-deep';
+import webpack from 'webpack';
+import { WebpackOptions } from 'webpack/declarations/WebpackOptions';
 import { base } from '../conf/webpack.base';
 import { getServerConfig } from '../conf/webpack.server';
 import { getClientConfig } from '../conf/webpack.client';
@@ -13,7 +15,7 @@ export class Packer {
 
   private serverConfig: WebpackOptions;
   private clientConfig: WebpackOptions;
-  private baseConfig: WebpackOptions = JSON.parse(JSON.stringify(base));
+  private baseConfig: WebpackOptions = clone(base);
 
   constructor(pageConfig: Required<PageConfig>) {
     // console.log('vue2-packer:', pageConfig);
@@ -48,6 +50,13 @@ export class Packer {
           // todo
         }
       },
+    });
+
+    webpack(this.clientConfig).watch({}, (err, stats) => {
+      if (err) {
+        throw err;
+      }
+      // const stat = stats.toJson();
     });
   }
 

@@ -13,7 +13,6 @@ export const getServerConfig = (base: WebpackOptions, options: ExternalConfig): 
     entry: {
       app: options.entry,
     },
-    devtool: isDev ? 'cheap-module-eval-source-map' : '',
     output: {
       filename: isDev ? '[name].js' : '[name]/app.js',
       path: options.dist,
@@ -21,6 +20,30 @@ export const getServerConfig = (base: WebpackOptions, options: ExternalConfig): 
     },
     externals: [nodeExternals(),],
   };
+
+  config.module.rules.push(
+    {
+      test: /\.(ts|js)x?$/,
+      loader: 'babel-loader',
+      options: {
+        presets: [
+          [
+            '@babel/preset-env',
+            { targets: { node: '10' } }
+          ],
+          '@babel/preset-typescript',
+        ],
+      },
+    },
+    {
+      test: /\.css$/,
+      use: ['null-loader'],
+    },
+    {
+      test: /\.less$/,
+      use: ['null-loader'],
+    },
+  );
 
   if (isDev) {
     config.plugins.push(new webpack.ProgressPlugin(options.onProgress));

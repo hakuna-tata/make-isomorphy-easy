@@ -1,6 +1,7 @@
 import webpack from 'webpack';
 import { ExternalConfig } from './webpack.base';
 import { WebpackOptions } from 'webpack/declarations/WebpackOptions';
+import  { loader as MiniCssExtractLoader } from 'mini-css-extract-plugin';
 import VueSSRClientPlugin from 'vue-server-renderer/client-plugin';
 
 export const getClientConfig = (base: WebpackOptions, options: ExternalConfig): WebpackOptions => {
@@ -18,8 +19,42 @@ export const getClientConfig = (base: WebpackOptions, options: ExternalConfig): 
       path: options.dist,
       library: 'mieApp',
       libraryTarget: 'umd2',
+      libraryExport: 'default',
     },
   };
+
+  config.module.rules.push(
+    {
+      test: /\.(ts|js)x?$/,
+      use: [
+        {
+          loader: 'babel-loader',
+          options: {
+            sourceType: 'unambiguous',
+            presets: [
+              [
+                '@babel/preset-env',
+                {
+                  targets: {
+                    browsers: ['ios >= 9', 'Android >= 6.0'],
+                  }
+                },
+              ],
+              '@babel/preset-typescript',
+            ]
+          }
+        }
+      ],
+    },
+    {
+      test: /\.css$/,
+      use: [isDev ? 'vue-style-loader' : MiniCssExtractLoader, 'css-loader'],
+    },
+    {
+      test: /\.less$/,
+      use: [isDev ? 'vue-style-loader' : MiniCssExtractLoader, 'css-loader', 'less-loader'],
+    },
+  );
 
   config.plugins.push(
     new VueSSRClientPlugin({
