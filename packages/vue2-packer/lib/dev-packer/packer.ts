@@ -15,7 +15,6 @@ export class Packer {
 
   private serverConfig: WebpackOptions;
   private clientConfig: WebpackOptions;
-  private baseConfig: WebpackOptions = clone(base);
 
   constructor(pageConfig: Required<PageConfig>) {
     // console.log('vue2-packer:', pageConfig);
@@ -31,7 +30,7 @@ export class Packer {
       mkdirSync(clientDist, { recursive: true });
     }
 
-    this.serverConfig = getServerConfig(this.baseConfig, {
+    this.serverConfig = getServerConfig(clone(base), {
       mode: 'development',
       entry: join(pageDir, './App.vue'),
       dist: serverDist,
@@ -41,7 +40,8 @@ export class Packer {
         }
       },
     });
-    this.clientConfig = getClientConfig(this.baseConfig, {
+
+    this.clientConfig = getClientConfig(clone(base), {
       mode: 'development',
       entry: join(pageDir, './App.vue'),
       dist: clientDist,
@@ -52,12 +52,14 @@ export class Packer {
       },
     });
 
-    webpack(this.clientConfig).watch({}, (err, stats) => {
-      if (err) {
-        throw err;
-      }
-      // const stat = stats.toJson();
-    });
+    // webpack(this.serverConfig).watch({}, (err, stats) => {
+    //   if (err) {
+    //     throw err;
+    //   }
+    //   const stat = stats.toJson();
+    //   stat.errors.forEach((err) => console.error(err));
+    //   stat.warnings.forEach((err) => console.warn(err));
+    // });
   }
 
   getBuildingRender(): BundleRenderer {

@@ -48,11 +48,11 @@ export const getClientConfig = (base: WebpackOptions, options: ExternalConfig): 
     },
     {
       test: /\.css$/,
-      use: [isDev ? 'vue-style-loader' : MiniCssExtractLoader, 'css-loader'],
+      use: [isDev ? 'style-loader' : MiniCssExtractLoader, 'css-loader'],
     },
     {
       test: /\.less$/,
-      use: [isDev ? 'vue-style-loader' : MiniCssExtractLoader, 'css-loader', 'less-loader'],
+      use: [isDev ? 'style-loader' : MiniCssExtractLoader, 'css-loader', 'less-loader'],
     },
   );
 
