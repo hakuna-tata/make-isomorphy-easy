@@ -5,7 +5,7 @@
   ],
   "scripts": {
     "dev": "nodemon --exec npm run dev:mie",
-    "dev:mie": "node --inspect=7000 -r ts-node/register ./example/server",
+    "dev:mie": "node -r ts-node/register ./example/server",
     "dev:brk": "node --inspect-brk -r ts-node/register ./example/server"
   },
   "license": "MIT",

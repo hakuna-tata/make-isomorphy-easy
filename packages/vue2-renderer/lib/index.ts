@@ -23,11 +23,6 @@ export class Renderer implements RendererInstance {
     return new Promise((resolve, reject) => {});
   }
 
-  private createInnerRenderer(dist: string): BundleRenderer {
-     return {} as BundleRenderer;
-  }
-
-
   private getInnerRenderer() {
     if (this.innerRenderer) {
       return this.innerRenderer;
@@ -44,4 +39,8 @@ export class Renderer implements RendererInstance {
       return this.innerRenderer;
     }
   }
+
+  private createInnerRenderer(dist: string): BundleRenderer {
+    return {} as BundleRenderer;
+ }
 }

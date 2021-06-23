@@ -3,16 +3,18 @@ import { existsSync, mkdirSync } from 'fs';
 import { PageConfig } from '@mie-js/core';
 import { BundleRenderer } from 'vue-server-renderer';
 import clone from 'clone-deep';
+import { fork } from 'child_process';
+import Koa  from 'koa';
 import webpack from 'webpack';
 import { WebpackOptions } from 'webpack/declarations/WebpackOptions';
 import { base } from '../conf/webpack.base';
 import { getServerConfig } from '../conf/webpack.server';
 import { getClientConfig } from '../conf/webpack.client';
 
-
 export class Packer {
   private innerDist = join(__dirname, '../../innerDist');
 
+  private app;
   private serverConfig: WebpackOptions;
   private clientConfig: WebpackOptions;
 
@@ -52,14 +54,17 @@ export class Packer {
       },
     });
 
-    // webpack(this.serverConfig).watch({}, (err, stats) => {
-    //   if (err) {
-    //     throw err;
-    //   }
-    //   const stat = stats.toJson();
-    //   stat.errors.forEach((err) => console.error(err));
-    //   stat.warnings.forEach((err) => console.warn(err));
-    // });
+    this.initDevServer();
+  }
+
+  private initDevServer() {
+    if (this.app) return;
+
+    const cp = fork(join(__dirname, './child'));
+
+    cp.on('message', (ctx) => {
+      // console.log(ctx);
+    })
   }
 
   getBuildingRender(): BundleRenderer {
