@@ -1,14 +1,12 @@
 import Koa from 'koa';
 
-const app = new Koa();
+process.on('message', (data) => {
+  const { devPort } = data;
+  const app = new Koa();
 
-app.use(async ctx => {
-  ctx.body = 'Hello World';
-});
-
-app.listen(9000, () => {
-  process.send({
-    app,
-    port: '9000'
+  app.listen(devPort, () => {
+    process.send({
+      app,
+    })
   });
 });

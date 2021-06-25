@@ -4,7 +4,6 @@ import { PageConfig } from '@mie-js/core';
 import { BundleRenderer } from 'vue-server-renderer';
 import clone from 'clone-deep';
 import { fork } from 'child_process';
-import Koa  from 'koa';
 import webpack from 'webpack';
 import { WebpackOptions } from 'webpack/declarations/WebpackOptions';
 import { base } from '../conf/webpack.base';
@@ -13,8 +12,9 @@ import { getClientConfig } from '../conf/webpack.client';
 
 export class Packer {
   private innerDist = join(__dirname, '../../innerDist');
+  private devPort = 60129;
 
-  private app;
+  private app: unknown;
   private serverConfig: WebpackOptions;
   private clientConfig: WebpackOptions;
 
@@ -57,14 +57,60 @@ export class Packer {
     this.initDevServer();
   }
 
-  private initDevServer() {
-    if (this.app) return;
+  private async initDevServer(): Promise<void> {
+    await this.runDevServer();
 
-    const cp = fork(join(__dirname, './child'));
+    // this.initServerCompiler();
+    this.initClientCompiler();
+  }
 
-    cp.on('message', (ctx) => {
-      // console.log(ctx);
+  private runDevServer(): Promise<void> {
+    return new Promise((resolve) => {
+      if (this.app) return;
+
+        const cp = fork(join(__dirname, './child'));
+
+        cp.send({
+          devPort: this.devPort
+        });
+
+        cp.on('message', (data: { app: unknown }) => {
+          this.app = data.app;
+          resolve();
+        });
     })
+  }
+
+  private initServerCompiler() {
+    webpack(this.serverConfig).watch({}, (err, stats) => {
+      if (err) {
+        // eslint-disable-next-line no-console
+        console.log(err);
+        throw err;
+      }
+      const stat = stats.toJson();
+      // eslint-disable-next-line no-console
+      stat.errors.forEach((err) => console.error(err));
+      // eslint-disable-next-line no-console
+      stat.warnings.forEach((err) => console.warn(err));
+    });
+  }
+
+  private initClientCompiler() {
+    const clientCompiler = webpack(this.clientConfig);
+
+    clientCompiler.watch({}, (err, stats) => {
+      if (err) {
+        // eslint-disable-next-line no-console
+        console.log(err);
+        throw err;
+      }
+      const stat = stats.toJson();
+      // eslint-disable-next-line no-console
+      stat.errors.forEach((err) => console.error(err));
+      // eslint-disable-next-line no-console
+      stat.warnings.forEach((err) => console.warn(err));
+    });
   }
 
   getBuildingRender(): BundleRenderer {
