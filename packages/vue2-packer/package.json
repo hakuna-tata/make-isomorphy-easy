@@ -25,6 +25,7 @@
     "clone-deep": "^4.0.1",
     "css-loader": "^5.2.6",
     "koa": "^2.13.1",
+    "koa-static": "^5.0.0",
     "less-loader": "^10.0.0",
     "mini-css-extract-plugin": "^1.6.0",
     "null-loader": "^4.0.1",

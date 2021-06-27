@@ -1,9 +1,11 @@
 import { join } from 'path';
 import { existsSync, mkdirSync } from 'fs';
+import { PassThrough } from 'stream';
 import { PageConfig } from '@mie-js/core';
 import { BundleRenderer } from 'vue-server-renderer';
 import clone from 'clone-deep';
-import { fork } from 'child_process';
+import Koa from 'koa';
+import serve from 'koa-static';
 import webpack from 'webpack';
 import { WebpackOptions } from 'webpack/declarations/WebpackOptions';
 import { base } from '../conf/webpack.base';
@@ -12,9 +14,11 @@ import { getClientConfig } from '../conf/webpack.client';
 
 export class Packer {
   private innerDist = join(__dirname, '../../innerDist');
+  private devServer: Koa;
   private devPort = 60129;
+  private route = '';
+  private streams: { [id: string]: PassThrough } = {};
 
-  private app: unknown;
   private serverConfig: WebpackOptions;
   private clientConfig: WebpackOptions;
 
@@ -22,6 +26,7 @@ export class Packer {
     // console.log('vue2-packer:', pageConfig);
     const { pageDir = '', route = '', template = ''} = pageConfig;
 
+    this.route = route;
     const serverDist = join(this.innerDist, `./server${route}`);
     const clientDist = join(this.innerDist, `./client${route}`);
 
@@ -57,27 +62,35 @@ export class Packer {
     this.initDevServer();
   }
 
+  private get progress(): string {
+    return `${this.route}/progress`;
+  }
+
   private async initDevServer(): Promise<void> {
     await this.runDevServer();
-
-    // this.initServerCompiler();
+    this.initServerCompiler();
     this.initClientCompiler();
+    this.devServer.use(async (ctx, next) => {
+      if (ctx.path === this.progress) {
+        const duplexStream = new PassThrough();
+        const id = `stream-${Date.now()}`;
+        this.streams[id] = duplexStream;
+        ctx.body = duplexStream;
+      } else {
+        await next();
+      }
+    });
+    this.devServer.use(serve(join(this.innerDist, './client')));
   }
 
   private runDevServer(): Promise<void> {
     return new Promise((resolve) => {
-      if (this.app) return;
+      const app = new Koa();
 
-        const cp = fork(join(__dirname, './child'));
-
-        cp.send({
-          devPort: this.devPort
-        });
-
-        cp.on('message', (data: { app: unknown }) => {
-          this.app = data.app;
-          resolve();
-        });
+      app.listen(this.devPort, () => {
+        this.devServer = app;
+        resolve();
+      });
     })
   }
 
@@ -115,5 +128,9 @@ export class Packer {
 
   getBuildingRender(): BundleRenderer {
     return {} as BundleRenderer;
+  }
+
+  private removeStream(id: string) {
+    this.streams[id] = null;
   }
 }
