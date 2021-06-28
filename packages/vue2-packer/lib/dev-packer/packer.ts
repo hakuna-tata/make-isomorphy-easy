@@ -1,16 +1,20 @@
 import { join } from 'path';
-import { existsSync, mkdirSync } from 'fs';
+import { readFileSync, existsSync, mkdirSync } from 'fs';
 import { PassThrough } from 'stream';
 import { PageConfig } from '@mie-js/core';
 import { BundleRenderer } from 'vue-server-renderer';
 import clone from 'clone-deep';
+import HtmlWebpackPlugin from 'html-webpack-plugin';
 import Koa from 'koa';
 import serve from 'koa-static';
-import webpack from 'webpack';
+import webpack, { Configuration } from 'webpack';
 import { WebpackOptions } from 'webpack/declarations/WebpackOptions';
 import { base } from '../conf/webpack.base';
 import { getServerConfig } from '../conf/webpack.server';
 import { getClientConfig } from '../conf/webpack.client';
+import { getServerTemplate } from './template';
+
+const defalutTemplate = readFileSync(join(__dirname, '../../template.html'), 'utf-8');
 
 export class Packer {
   private innerDist = join(__dirname, '../../innerDist');
@@ -48,10 +52,17 @@ export class Packer {
       },
     });
 
+    this.serverConfig.plugins.push(
+      new HtmlWebpackPlugin({
+        // templateContent: getServerTemplate(template || defalutTemplate, { isDev: true }),
+      })
+    )
+
     this.clientConfig = getClientConfig(clone(base), {
       mode: 'development',
       entry: join(pageDir, './App.vue'),
       dist: clientDist,
+      hmrPath: this.hmrPath,
       onProgress: (percentage: number, message: string) => {
         if (percentage === 1) {
           // todo
@@ -64,6 +75,10 @@ export class Packer {
 
   private get progress(): string {
     return `${this.route}/progress`;
+  }
+
+  private get hmrPath(): string {
+    return `${this.route}/__webpack_hmr`;
   }
 
   private async initDevServer(): Promise<void> {
@@ -95,7 +110,7 @@ export class Packer {
   }
 
   private initServerCompiler() {
-    webpack(this.serverConfig).watch({}, (err, stats) => {
+    webpack(this.serverConfig as Configuration).watch({}, (err, stats) => {
       if (err) {
         // eslint-disable-next-line no-console
         console.log(err);
@@ -110,7 +125,7 @@ export class Packer {
   }
 
   private initClientCompiler() {
-    const clientCompiler = webpack(this.clientConfig);
+    const clientCompiler = webpack(this.clientConfig as Configuration);
 
     clientCompiler.watch({}, (err, stats) => {
       if (err) {

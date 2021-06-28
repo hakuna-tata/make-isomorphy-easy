@@ -6,6 +6,7 @@ export interface ExternalConfig {
   entry: string;
   dist: string;
   onProgress: (percentage: number, message: string) => void;
+  hmrPath?: string,
 }
 
 
