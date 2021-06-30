@@ -20,7 +20,14 @@ export class Renderer implements RendererInstance {
   async render(context: BaseContext): Promise<string> {
     const innerRenderer = this.getInnerRenderer();
 
-    return new Promise((resolve, reject) => {});
+    return new Promise((resolve, reject) => {
+      innerRenderer.renderToString(context, (error, res) => {
+        if (error) {
+          return reject(error);
+        }
+        resolve(res);
+      });
+    });
   }
 
   private getInnerRenderer() {

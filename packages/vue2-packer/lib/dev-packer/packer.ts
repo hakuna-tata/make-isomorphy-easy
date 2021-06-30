@@ -1,6 +1,6 @@
 import { join } from 'path';
 import { readFileSync, existsSync, mkdirSync } from 'fs';
-import { PassThrough } from 'stream';
+import { Duplex } from 'stream';
 import { PageConfig } from '@mie-js/core';
 import { BundleRenderer } from 'vue-server-renderer';
 import clone from 'clone-deep';
@@ -9,11 +9,13 @@ import Koa from 'koa';
 import serve from 'koa-static';
 import webpack, { Configuration } from 'webpack';
 import { WebpackOptions } from 'webpack/declarations/WebpackOptions';
+import ejs from 'ejs';
 import { base } from '../conf/webpack.base';
 import { getServerConfig } from '../conf/webpack.server';
 import { getClientConfig } from '../conf/webpack.client';
 import { getServerTemplate } from './template';
 
+const buildingEjs = readFileSync(join(__dirname, '../../ejs/building.ejs'), 'utf-8');
 const defalutTemplate = readFileSync(join(__dirname, '../../template.html'), 'utf-8');
 
 export class Packer {
@@ -21,7 +23,7 @@ export class Packer {
   private devServer: Koa;
   private devPort = 60129;
   private route = '';
-  private streams: { [id: string]: PassThrough } = {};
+  private streams: { [id: string]: Duplex } = {};
 
   private serverConfig: WebpackOptions;
   private clientConfig: WebpackOptions;
@@ -87,7 +89,7 @@ export class Packer {
     this.initClientCompiler();
     this.devServer.use(async (ctx, next) => {
       if (ctx.path === this.progress) {
-        const duplexStream = new PassThrough();
+        const duplexStream = new Duplex();
         const id = `stream-${Date.now()}`;
         this.streams[id] = duplexStream;
         ctx.body = duplexStream;
@@ -142,7 +144,9 @@ export class Packer {
   }
 
   getBuildingRender(): BundleRenderer {
-    return {} as BundleRenderer;
+    return {
+      renderToString: (ctx, callback) => callback(null, ejs.render(buildingEjs, { url: this.progress }))
+    } as BundleRenderer;
   }
 
   private removeStream(id: string) {
