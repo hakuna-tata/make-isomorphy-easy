@@ -1,6 +1,7 @@
 import { join } from 'path';
 import { readFileSync, existsSync, mkdirSync } from 'fs';
-import { Duplex } from 'stream';
+import { PassThrough as Duplex } from 'stream';
+import { createProxyServer } from 'http-proxy';
 import { PageConfig } from '@mie-js/core';
 import { BundleRenderer } from 'vue-server-renderer';
 import clone from 'clone-deep';
@@ -9,18 +10,19 @@ import Koa from 'koa';
 import serve from 'koa-static';
 import webpack, { Configuration } from 'webpack';
 import { WebpackOptions } from 'webpack/declarations/WebpackOptions';
-import ejs from 'ejs';
 import { base } from '../conf/webpack.base';
 import { getServerConfig } from '../conf/webpack.server';
 import { getClientConfig } from '../conf/webpack.client';
 import { getServerTemplate } from './template';
 
-const buildingEjs = readFileSync(join(__dirname, '../../ejs/building.ejs'), 'utf-8');
-const defalutTemplate = readFileSync(join(__dirname, '../../template.html'), 'utf-8');
+const MIE_SSE_URL = '<!--mie_sse_url-->';
+const buildingHtml = readFileSync(join(__dirname, '../../template/building.html'), 'utf-8');
+const defalutTemplate = readFileSync(join(__dirname, '../../template/template.html'), 'utf-8');
 
 export class Packer {
   private innerDist = join(__dirname, '../../innerDist');
   private devServer: Koa;
+  private proxyServer;
   private devPort = 60129;
   private route = '';
   private streams: { [id: string]: Duplex } = {};
@@ -83,21 +85,40 @@ export class Packer {
     return `${this.route}/__webpack_hmr`;
   }
 
+  public proxy(context): void {
+    this.proxyServer.web(context.req, context.res);
+  }
+
+  getBuildingRender(): BundleRenderer {
+    return {
+      renderToString: (ctx, callback) => callback(null, buildingHtml.replace(MIE_SSE_URL, this.progress))
+    } as BundleRenderer;
+  }
+
   private async initDevServer(): Promise<void> {
     await this.runDevServer();
     this.initServerCompiler();
     this.initClientCompiler();
     this.devServer.use(async (ctx, next) => {
       if (ctx.path === this.progress) {
-        const duplexStream = new Duplex();
-        const id = `stream-${Date.now()}`;
-        this.streams[id] = duplexStream;
-        ctx.body = duplexStream;
+          const duplexStream = new Duplex();
+          const id = `stream-${Date.now()}`;
+          this.streams[id] = duplexStream;
+          ctx.req.on('close', () => this.removeStream(id));
+          ctx.req.on('finish', () => this.removeStream(id));
+          ctx.req.on('error', () => this.removeStream(id));
+          duplexStream.write("event: build\n");
+          duplexStream.write("data: " + "\n\n");
+          ctx.type = 'text/event-stream';
+          ctx.body = duplexStream;
       } else {
         await next();
       }
     });
     this.devServer.use(serve(join(this.innerDist, './client')));
+    this.proxyServer = createProxyServer({
+      target: `http://127.0.0.1:${this.devPort}`
+    });
   }
 
   private runDevServer(): Promise<void> {
@@ -106,6 +127,7 @@ export class Packer {
 
       app.listen(this.devPort, () => {
         this.devServer = app;
+
         resolve();
       });
     })
@@ -141,12 +163,6 @@ export class Packer {
       // eslint-disable-next-line no-console
       stat.warnings.forEach((err) => console.warn(err));
     });
-  }
-
-  getBuildingRender(): BundleRenderer {
-    return {
-      renderToString: (ctx, callback) => callback(null, ejs.render(buildingEjs, { url: this.progress }))
-    } as BundleRenderer;
   }
 
   private removeStream(id: string) {

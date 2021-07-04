@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>正在构建</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+    #progress-container {
+      text-align: center;
+      position: fixed;
+      left: 0;
+      right: 0;
+      top: 30%;
+    }
+    #progress-circle {
+      transform-origin: center;
+      transform: rotate(-90deg);
+    }
+    #progress-tip {
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <section id="progress-container">
+    <svg xmlns="http://www.w3.org/200/svg" height="120" width="120" >
+      <circle cx="60" cy="60" r="57" fill="none" stroke="#eeeeee" stroke-width="3" stroke-linecap="round"/>
+      <circle id="progress-circle" id="J_progress_bar" cx="60" cy="60" r="57" fill="none" stroke="#52a95f" stroke-width="3" stroke-dasharray="1,10000"/>
+      <text id="progress-text" x="50%" y="50%" dy=".3em" fill="#52a95f" text-anchor="middle">0%</text>
+    </svg>
+    <p id="progress-tip">正在构建</p>
+  </section>
+  <script>
+    if ('EventSource' in window) {
+      var source = new EventSource('<!--mie_sse_url-->');
+
+      var circle = document.getElementById('progress-circle');
+      var text = document.getElementById('progress-text');
+      var round = Math.ceil(circle.getAttribute('r')) * Math.PI * 2;
+
+      source.onopen = function(event) {
+        document.getElementById('progress-tip').innerHTML = '构建开始';
+      };
+
+      source.onerror = function (event) {
+        document.getElementById('progress-tip').innerHTML = '构建失败';
+      };
+
+      source.onmessage = function (event) {
+        var data = event.data;
+        console.log(data);
+        try {
+          data = JSON.parse(data);
+          if (data.percent === 100 && data.msg === 'done') {
+            document.getElementById('progress-tip').innerHTML = '构建成功';
+            text.innerHTML = '100%';
+            setTimeout(function() {
+              location.reload();
+            }, 200);
+            return;
+          }
+          text.innerHTML = Math.min(parseInt(data.percent * 100), 99) + '%';
+          circle.setAttribute('stroke-dasharray', (round * data.percent).toString() + ',10000');
+        } catch(e) {}
+      };
+    }
+  </script>
+</body>
+</html>

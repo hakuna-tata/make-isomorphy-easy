@@ -13,14 +13,23 @@ export class Renderer implements RendererInstance {
   private devPacker;
 
   constructor(options: RendererOpts) {
-    // console.log('vue2 renderer:', this.options);
     this.options = options;
+    // console.log('vue2 renderer:', this.options);
   }
 
   async render(context: BaseContext): Promise<string> {
     const innerRenderer = this.getInnerRenderer();
+    const requestPath = context.path.replace(/\/$/, '');
+    const isPageRequest =
+      requestPath === this.options.pageConfig.route || requestPath === this.options.pageConfig.route.replace(/\/index$/, '');
 
     return new Promise((resolve, reject) => {
+      if(!isPageRequest) {
+        if (this.devPacker) {
+          return this.devPacker.proxy(context);
+        }
+      }
+
       innerRenderer.renderToString(context, (error, res) => {
         if (error) {
           return reject(error);
