@@ -33,8 +33,8 @@ export class Packer {
   constructor(pageConfig: Required<PageConfig>) {
     // console.log('vue2-packer:', pageConfig);
     const { pageDir = '', route = '', template = ''} = pageConfig;
-
     this.route = route;
+
     const serverDist = join(this.innerDist, `./server${route}`);
     const clientDist = join(this.innerDist, `./client${route}`);
 
@@ -49,7 +49,7 @@ export class Packer {
       mode: 'development',
       entry: join(pageDir, './App.vue'),
       dist: serverDist,
-      onProgress: (percentage: number, message: string) => {
+      onProgress: (percentage: number) => {
         if (percentage === 1) {
           // todo
         }
@@ -67,7 +67,7 @@ export class Packer {
       entry: join(pageDir, './App.vue'),
       dist: clientDist,
       hmrPath: this.hmrPath,
-      onProgress: (percentage: number, message: string) => {
+      onProgress: (percentage: number) => {
         if (percentage === 1) {
           // todo
         }

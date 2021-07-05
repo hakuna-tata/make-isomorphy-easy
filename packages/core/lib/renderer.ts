@@ -1,22 +1,22 @@
 import { BaseContext } from 'koa';
+import { PageConfig } from './mieTypes';
 import { RendererOpts, RendererInstance } from './rendererTypes';
 
 const renderCache: {
   [key: string]: RendererInstance
 } = {};
 
-export const initRender = async (ctx: BaseContext, opts: RendererOpts): Promise<string> => {
+export const initRenderer = (opts: RendererOpts): void => {
   const { pageConfig } = opts;
-
-  if (renderCache[pageConfig.route] === undefined) {
-    try {
+  try {
       const renderInstance = new pageConfig.Renderer(opts);
 
       renderCache[pageConfig.route] = renderInstance;
-    } catch (error) {
-      throw new Error(`[page: ${pageConfig.route}] init render error`);
-    }
+  } catch (error) {
+    throw new Error(`[page: ${pageConfig.route}] init render error`);
   }
+}
 
-  return await renderCache[pageConfig.route].render(ctx);
+export const render = async (ctx: BaseContext, targetPage: Required<PageConfig>): Promise<string> => {
+  return await renderCache[targetPage.route].render(ctx);
 }

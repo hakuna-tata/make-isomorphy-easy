@@ -3,11 +3,11 @@ import { MieOpts } from '@mie-js/core';
 import { Renderer as Vue2Renderer } from '@mie-js/vue2-renderer';
 
 export const config: MieOpts = {
-  pages: [
+  collections: [
     {
       pageDir: join(__dirname, 'vue2'),
-      route: 'vue2',
       Renderer: Vue2Renderer,
+      route: 'vue2',
       // template: join(__dirname, 'vue2/static/index.html'),
     }
   ],

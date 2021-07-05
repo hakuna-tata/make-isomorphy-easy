@@ -1,33 +1,41 @@
 import { BaseContext, Middleware } from 'koa';
 import { MieOpts } from './mieTypes';
 import { getPageConfig, matchPage } from './page';
-import { initRender } from './renderer';
+import { initRenderer, render } from './renderer';
 
 export const mie = (opts: MieOpts) : Middleware => {
-  const { pages = [], dev = false, dist = '' } = opts;
-  if (Array.isArray(pages) && pages.length) {
-    const pageRouteList = getPageConfig(opts);
+  const { collections = [], dev = false, dist = '', onError = null } = opts;
 
-    if (!dev) {
-      // TODO
-    }
+  if (!Array.isArray(collections) || !collections.length) {
+    throw new Error('collections must be no empty array');
+  }
 
-    return async (ctx: BaseContext, next: () => Promise<never>) : Promise<void> => {
-      const isMethodMatched = ctx.method === 'HEAD' || ctx.method === 'GET';
-      const targetPage = matchPage(pageRouteList, ctx.path);
+  const pageConfigList = getPageConfig(opts);
+  pageConfigList.forEach(pageConfig => {
+    initRenderer({
+      pageConfig,
+      dev,
+      dist
+    });
+  })
 
-      if (isMethodMatched && targetPage) {
-        try {
-          ctx.body = await initRender(ctx, { dev, dist, pageConfig: targetPage });
-        } catch(e) {
-          ctx.status = 500;
-          ctx.body = 'internal error';
+  return async (ctx: BaseContext, next: () => Promise<never>) : Promise<void> => {
+    const isMethodMatched = ctx.method === 'HEAD' || ctx.method === 'GET';
+    const targetPage = matchPage(pageConfigList, ctx.path);
+
+    if (isMethodMatched && targetPage) {
+      try {
+        ctx.body = await render(ctx, targetPage );
+      } catch(e) {
+        ctx.status = 500;
+        ctx.body = 'internal error';
+        
+        if (typeof onError === 'function') {
+          await onError(e, ctx);
         }
       }
-
-      await next();
     }
-  } else {
-    throw new Error('pages must be no empty array');
+
+    await next();
   }
 }

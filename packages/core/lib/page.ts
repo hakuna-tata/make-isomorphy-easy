@@ -7,10 +7,10 @@ const preserveDirs = ['components', 'assets', 'layout', 'utils', 'static', 'serv
 
 export const getPageConfig = (opts: MieOpts): Required<PageConfig>[] => {
   const pageConfigList: Required<PageConfig>[] = [];
-  const { pages = [] } = opts;
+  const { collections = [] } = opts;
 
-  pages.forEach(pageConfig => {
-    const { pageDir, Renderer, route = '', template = '' } = pageConfig;
+  collections.forEach(pageConfig => {
+    const { pageDir, Renderer, route = '', template = '', packerOption } = pageConfig;
 
     const connector = route.match(/\/$/) ? '' : '/';
 
@@ -25,9 +25,10 @@ export const getPageConfig = (opts: MieOpts): Required<PageConfig>[] => {
 
           pageConfigList.push({
             pageDir: join(pageDir, sub.name),
-            route: pageRoute,
             Renderer,
+            route: pageRoute,
             template: template ? readFileSync(template, 'utf-8') : '',
+            packerOption
           })
         })
     }

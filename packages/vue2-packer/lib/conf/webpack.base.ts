@@ -5,7 +5,7 @@ export interface ExternalConfig {
   mode: 'development' | 'production';
   entry: string;
   dist: string;
-  onProgress: (percentage: number, message: string) => void;
+  onProgress: (percentage: number, message?: string) => void;
   hmrPath?: string,
 }
 
