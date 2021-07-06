@@ -89,7 +89,7 @@ export class Packer {
     this.proxyServer.web(context.req, context.res);
   }
 
-  getBuildingRender(): BundleRenderer {
+  getBuildingRenderer(): BundleRenderer {
     return {
       renderToString: (ctx, callback) => callback(null, buildingHtml.replace(MIE_SSE_URL, this.progress))
     } as BundleRenderer;

@@ -29,7 +29,7 @@ export const mie = (opts: MieOpts) : Middleware => {
       } catch(e) {
         ctx.status = 500;
         ctx.body = 'internal error';
-        
+
         if (typeof onError === 'function') {
           await onError(e, ctx);
         }

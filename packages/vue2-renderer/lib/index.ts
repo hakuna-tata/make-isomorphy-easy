@@ -1,6 +1,5 @@
 import { BaseContext } from 'koa';
 import { RendererOpts, RendererInstance }  from '@mie-js/core';
-import { DevPacker } from '@mie-js/vue2-packer';
 import { BundleRenderer } from 'vue-server-renderer';
 
 export class Renderer implements RendererInstance {
@@ -15,13 +14,15 @@ export class Renderer implements RendererInstance {
   constructor(options: RendererOpts) {
     this.options = options;
     // console.log('vue2 renderer:', this.options);
+
+    this.initInnerRenderer();
   }
 
   async render(context: BaseContext): Promise<string> {
-    const innerRenderer = this.getInnerRenderer();
     const requestPath = context.path.replace(/\/$/, '');
+    const { pageConfig } = this.options;
     const isPageRequest =
-      requestPath === this.options.pageConfig.route || requestPath === this.options.pageConfig.route.replace(/\/index$/, '');
+      requestPath === pageConfig.route || requestPath === pageConfig.route.replace(/\/index$/, '');
 
     return new Promise((resolve, reject) => {
       if(!isPageRequest) {
@@ -30,33 +31,36 @@ export class Renderer implements RendererInstance {
         }
       }
 
-      innerRenderer.renderToString(context, (error, res) => {
-        if (error) {
-          return reject(error);
-        }
-        resolve(res);
-      });
+      if (this.innerRenderer) {
+        this.innerRenderer.renderToString(context, (error, res) => {
+          if (error) {
+            reject(error);
+          }
+          resolve(res);
+        });
+      } else {
+        reject();
+      }
     });
   }
 
-  private getInnerRenderer() {
-    if (this.innerRenderer) {
-      return this.innerRenderer;
-    }
-
+  private async initInnerRenderer() {
     if (this.options.dev) {
-      this.devPacker = new DevPacker(this.options.pageConfig);
-      this.innerRenderer = this.devPacker.getBuildingRender();
+      await import(Renderer.packer)
+        .then(({ DevPacker }) => {
+          this.devPacker = new DevPacker(this.options.pageConfig);
+          this.innerRenderer = this.devPacker.getBuildingRenderer();
+        })
+        .catch((err: Error) => {
+          throw err.message;
+        })
 
-      return this.innerRenderer;
     } else {
-      this.innerRenderer = this.createInnerRenderer(this.options.dist);
-
-      return this.innerRenderer;
+      this.createInnerRenderer(this.options.dist);
     }
   }
 
-  private createInnerRenderer(dist: string): BundleRenderer {
-    return {} as BundleRenderer;
- }
+  private createInnerRenderer(dist: string): void {
+
+  }
 }
