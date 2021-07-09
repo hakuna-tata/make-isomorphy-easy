@@ -47,9 +47,9 @@ export class Renderer implements RendererInstance {
   private async initInnerRenderer() {
     if (this.options.dev) {
       await import(Renderer.packer)
-        .then(({ DevPacker }) => {
+        .then(async ({ DevPacker }) => {
           this.devPacker = new DevPacker(this.options.pageConfig);
-          this.innerRenderer = this.devPacker.getBuildingRenderer();
+          this.innerRenderer = await this.devPacker.getBuildingRenderer();
         })
         .catch((err: Error) => {
           throw err.message;

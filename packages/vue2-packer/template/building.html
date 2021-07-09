@@ -30,10 +30,10 @@
   <section id="progress-container">
     <svg xmlns="http://www.w3.org/200/svg" height="120" width="120" >
       <circle cx="60" cy="60" r="57" fill="none" stroke="#eeeeee" stroke-width="3" stroke-linecap="round"/>
-      <circle id="progress-circle" id="J_progress_bar" cx="60" cy="60" r="57" fill="none" stroke="#52a95f" stroke-width="3" stroke-dasharray="1,10000"/>
-      <text id="progress-text" x="50%" y="50%" dy=".3em" fill="#52a95f" text-anchor="middle">0%</text>
+      <circle id="progress-circle" id="J_progress_bar" cx="60" cy="60" r="57" fill="none" stroke="#c09" stroke-width="3" stroke-dasharray="1,10000"/>
+      <text id="progress-text" x="50%" y="50%" dy=".3em" fill="#c09" text-anchor="middle">0%</text>
     </svg>
-    <p id="progress-tip">正在构建</p>
+    <p id="progress-tip" style="color: #c09;">正在构建</p>
   </section>
   <script>
     if ('EventSource' in window) {
@@ -53,19 +53,20 @@
 
       source.onmessage = function (event) {
         var data = event.data;
-        console.log(data);
+
         try {
           data = JSON.parse(data);
-          if (data.percent === 100 && data.msg === 'done') {
-            document.getElementById('progress-tip').innerHTML = '构建成功';
+          if (data.percentage === 1 && data.msg === 'done') {
             text.innerHTML = '100%';
+            circle.setAttribute('stroke-dasharray', (round * data.percentage).toString() + ',10000');
+            document.getElementById('progress-tip').innerHTML = '构建成功';
             setTimeout(function() {
               location.reload();
             }, 200);
             return;
           }
-          text.innerHTML = Math.min(parseInt(data.percent * 100), 99) + '%';
-          circle.setAttribute('stroke-dasharray', (round * data.percent).toString() + ',10000');
+          text.innerHTML = Math.min(parseInt(data.percentage * 100), 99) + '%';
+          circle.setAttribute('stroke-dasharray', (round * data.percentage).toString() + ',10000');
         } catch(e) {}
       };
     }
