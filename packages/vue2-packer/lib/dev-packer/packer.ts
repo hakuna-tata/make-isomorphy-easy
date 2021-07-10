@@ -54,7 +54,7 @@ export class Packer extends EventEmitter {
 
     this.serverConfig = getServerConfig(clone(base), {
       mode: 'development',
-      entry: join(pageDir, './App.vue'),
+      entry: join(__dirname, '../entry/server.js'),
       dist: serverDist,
       onProgress: (percentage: number) => {
         if (percentage === 1) {
@@ -71,7 +71,7 @@ export class Packer extends EventEmitter {
 
     this.clientConfig = getClientConfig(clone(base), {
       mode: 'development',
-      entry: join(pageDir, './App.vue'),
+      entry: join(__dirname, '../entry/client.js'),
       dist: clientDist,
       hmrPath: this.hmrPath,
       onProgress: (percentage: number) => {

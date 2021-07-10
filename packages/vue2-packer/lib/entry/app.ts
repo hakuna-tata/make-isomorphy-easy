@@ -2,7 +2,7 @@ import Vue from 'vue';
 
 export const createApp = (context): { app: Vue } => {
   const app = new Vue({
-    ...context
+    template: '<div>12356</div>'
   });
 
   return { app };

@@ -47,8 +47,8 @@
         document.getElementById('progress-tip').innerHTML = '构建开始';
       };
 
-      source.onerror = function (event) {
-        document.getElementById('progress-tip').innerHTML = '构建失败';
+      source.onclose = function (event) {
+        document.getElementById('progress-tip').innerHTML = '构建完成';
       };
 
       source.onmessage = function (event) {

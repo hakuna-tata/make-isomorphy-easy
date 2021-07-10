@@ -12,7 +12,7 @@ export interface ExternalConfig {
 
 export const base: WebpackOptions = {
   resolve: {
-    extensions: ['js', 'vue', 'ts', 'json'],
+    extensions: ['.js', '.vue', '.ts', '.json'],
     modules: module.paths,
   },
   module: {
