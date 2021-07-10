@@ -1,6 +1,7 @@
+import { join } from 'path';
 import { BaseContext } from 'koa';
 import { RendererOpts, RendererInstance }  from '@mie-js/core';
-import { BundleRenderer } from 'vue-server-renderer';
+import { createBundleRenderer ,BundleRenderer } from 'vue-server-renderer';
 
 export class Renderer implements RendererInstance {
   static type = '@mie-js/vue2-render';
@@ -48,7 +49,10 @@ export class Renderer implements RendererInstance {
     if (this.options.dev) {
       await import(Renderer.packer)
         .then(async ({ DevPacker }) => {
-          this.devPacker = new DevPacker(this.options.pageConfig);
+          this.devPacker = new DevPacker(this.options.dist, this.options.pageConfig);
+          this.devPacker.on('buildEnd', () => {
+            this.createInnerRenderer(this.options.dist);
+          });
           this.innerRenderer = await this.devPacker.getBuildingRenderer();
         })
         .catch((err: Error) => {
@@ -61,6 +65,26 @@ export class Renderer implements RendererInstance {
   }
 
   private createInnerRenderer(dist: string): void {
+    const { pageConfig } = this.options;
+    const serverBundlePath = join(dist, `./server${pageConfig.route}/mie-vue2-server-bundle.json`);
+    const clientManifestPath = join(dist, `/client${pageConfig.route}/mie-vue2-client-manifest.json`);
 
+    require.cache[serverBundlePath] = undefined;
+    require.cache[clientManifestPath] = undefined;
+
+
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const serverBundle = require(serverBundlePath);
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const clientManifest = require(clientManifestPath);
+
+      this.innerRenderer = createBundleRenderer(serverBundle, {
+        clientManifest,
+        runInNewContext: false,
+      })
+    } catch(error) {
+      throw error;
+    }
   }
 }

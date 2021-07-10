@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "nodemon --exec npm run dev:mie",
     "dev:mie": "node -r ts-node/register ./example/server",
-    "dev:brk": "node --inspect-brk -r ts-node/register ./example/server"
+    "dev:brk": "node --inspect-brk -r ts-node/register ./example/server",
+    "dev:pkg": "lerna exec -- npm run dev"
   },
   "license": "MIT",
   "devDependencies": {

@@ -2,6 +2,7 @@ import webpack from 'webpack';
 import { ExternalConfig } from './webpack.base';
 import { WebpackOptions } from 'webpack/declarations/WebpackOptions';
 import nodeExternals from 'webpack-node-externals';
+import VueSSRServerPlugin from 'vue-server-renderer/server-plugin';
 
 export const getServerConfig = (base: WebpackOptions, options: ExternalConfig): WebpackOptions => {
   const isDev = options.mode === 'development';
@@ -43,6 +44,12 @@ export const getServerConfig = (base: WebpackOptions, options: ExternalConfig): 
       test: /\.less$/,
       use: ['null-loader'],
     },
+  );
+
+  config.plugins.push(
+    new VueSSRServerPlugin({
+      filename: 'mie-vue2-server-bundle.json'
+    }),
   );
 
   if (isDev) {

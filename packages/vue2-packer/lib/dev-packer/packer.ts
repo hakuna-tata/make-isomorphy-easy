@@ -1,4 +1,5 @@
 import { join } from 'path';
+import { EventEmitter } from 'events';
 import { readFileSync, existsSync, mkdirSync } from 'fs';
 import { PassThrough } from 'stream';
 import { createProxyServer } from 'http-proxy';
@@ -22,11 +23,11 @@ const MIE_SSE_URL = '<!--mie_sse_url-->';
 const buildingHtml = readFileSync(join(__dirname, '../../template/building.html'), 'utf-8');
 const defalutTemplate = readFileSync(join(__dirname, '../../template/template.html'), 'utf-8');
 
-export class Packer {
-  private innerDist = join(__dirname, '../../innerDist');
+export class Packer extends EventEmitter {
   private devServer: Koa;
   private proxyServer;
   private route = '';
+  private dist = '';
   private streams = new PassThrough();
   private isCompiling = false;
   private buildStatus = { client: false, server: false };
@@ -34,13 +35,15 @@ export class Packer {
   private serverConfig: WebpackOptions;
   private clientConfig: WebpackOptions;
 
-  constructor(pageConfig: Required<PageConfig>) {
+  constructor(dist: string, pageConfig: Required<PageConfig>) {
+    super();
     // console.log('vue2-packer:', pageConfig);
     const { pageDir, route, template, packerOption} = pageConfig;
     this.route = route;
+    this.dist = dist;
 
-    const serverDist = join(this.innerDist, `./server${route}`);
-    const clientDist = join(this.innerDist, `./client${route}`);
+    const serverDist = join(dist, `./server${route}`);
+    const clientDist = join(dist, `./client${route}`);
 
     if (!existsSync(serverDist)) {
       mkdirSync(serverDist, { recursive: true });
@@ -136,7 +139,8 @@ export class Packer {
         await next();
       }
     });
-    this.devServer.use(serve(join(this.innerDist, './client')));
+
+    this.devServer.use(serve(join(this.dist, './client')));
   }
 
   private initServerCompiler() {
@@ -184,7 +188,10 @@ export class Packer {
       this.buildStatus.server = false;
       this.buildStatus.client = false;
 
+      this.emit('buildEnd');
       this.serverSentEvt({ percentage: 1, msg: 'done' });
+      this.streams.end();
+      this.streams = null;
     }
   }
 }
