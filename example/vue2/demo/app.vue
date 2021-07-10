@@ -3,13 +3,11 @@
 </template>
 
 <script>
-import Vue from "vue";
-
-export default Vue.extend({
+export default {
   data() {
     return { demo: "demo page" };
   },
-});
+};
 </script>
 
 <style scoped>

@@ -72,7 +72,6 @@ export class Renderer implements RendererInstance {
     require.cache[serverBundlePath] = undefined;
     require.cache[clientManifestPath] = undefined;
 
-
     try {
       // eslint-disable-next-line @typescript-eslint/no-var-requires
       const serverBundle = require(serverBundlePath);
