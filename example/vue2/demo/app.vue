@@ -1,12 +1,17 @@
 <template>
-  <div class="demo">{{ demo }}</div>
+  <div class="demo" @click="clickPage">{{ demo }}</div>
 </template>
 
 <script>
 export default {
   data() {
-    return { demo: "demo page by fff" };
+    return { demo: "demo page by xxx" };
   },
+  methods: {
+    clickPage() {
+      this.demo = 'i am clicking';
+    }
+  }
 };
 </script>
 
