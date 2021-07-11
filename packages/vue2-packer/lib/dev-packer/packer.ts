@@ -28,7 +28,7 @@ export class Packer extends EventEmitter {
   private proxyServer;
   private route = '';
   private dist = '';
-  private streams = new PassThrough();
+  private streams: { [id: string]: PassThrough } = {};
   private isCompiling = false;
   private buildStatus = { client: false, server: false };
 
@@ -143,8 +143,16 @@ export class Packer extends EventEmitter {
 
     this.devServer.use(async (ctx, next) => {
       if (ctx.path === this.progress) {
+          const stream = new PassThrough();
+          const id = `stream-${Date.now()}`;
+          this.streams[id] = stream;
+
+          ctx.req.on('close', () => this.removeStream(id));
+          ctx.req.on('finish', () => this.removeStream(id));
+          ctx.req.on('error', () => this.removeStream(id));
+          
           ctx.type = 'text/event-stream';
-          ctx.body = this.streams;
+          ctx.body = stream;
       } else {
         await next();
       }
@@ -188,7 +196,20 @@ export class Packer extends EventEmitter {
   private serverSentEvt(data: { percentage: number, msg?: string }) {
     const sseData = `data: ${JSON.stringify(data)}\n\n`;
 
-    this.streams.write(sseData);
+    Object.keys(this.streams).forEach(streamId => this.streams[streamId]?.write(sseData));
+  }
+
+  private removeStream(id) {
+    this.streams[id] = null;
+  }
+
+  private removeAllStreams() {
+    Object.keys(this.streams).forEach((streamId) => {
+      if (this.streams[streamId]) {
+        this.streams[streamId].end();
+        this.removeStream(streamId);
+      }
+    });
   }
 
   private buildDone(type: 'client' | 'server'): void {
@@ -200,8 +221,7 @@ export class Packer extends EventEmitter {
 
       this.emit('buildEnd');
       this.serverSentEvt({ percentage: 1, msg: 'done' });
-      this.streams.end();
-      this.streams = null;
+      this.removeAllStreams();
     }
   }
 }
