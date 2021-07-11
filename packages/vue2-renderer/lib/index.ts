@@ -1,4 +1,5 @@
 import { join } from 'path';
+import { readFileSync } from 'fs';
 import { BaseContext } from 'koa';
 import { RendererOpts, RendererInstance }  from '@mie-js/core';
 import { createBundleRenderer ,BundleRenderer } from 'vue-server-renderer';
@@ -11,6 +12,7 @@ export class Renderer implements RendererInstance {
 
   private innerRenderer: BundleRenderer;
   private devPacker;
+  private app;
 
   constructor(options: RendererOpts) {
     this.options = options;
@@ -33,10 +35,11 @@ export class Renderer implements RendererInstance {
       }
 
       if (this.innerRenderer) {
-        this.innerRenderer.renderToString(context, (error, res) => {
+        this.innerRenderer.renderToString({ app: this.app }, (error, res) => {
           if (error) {
             reject(error);
           }
+
           resolve(res);
         });
       } else {
@@ -67,7 +70,8 @@ export class Renderer implements RendererInstance {
   private createInnerRenderer(dist: string): void {
     const { pageConfig } = this.options;
     const serverBundlePath = join(dist, `./server${pageConfig.route}/mie-vue2-server-bundle.json`);
-    const clientManifestPath = join(dist, `/client${pageConfig.route}/mie-vue2-client-manifest.json`);
+    const clientManifestPath = join(dist, `./client${pageConfig.route}/mie-vue2-client-manifest.json`);
+    const template = readFileSync(join(dist, `./server${pageConfig.route}/template.html`), 'utf-8');
 
     require.cache[serverBundlePath] = undefined;
     require.cache[clientManifestPath] = undefined;
@@ -77,13 +81,32 @@ export class Renderer implements RendererInstance {
       const serverBundle = require(serverBundlePath);
       // eslint-disable-next-line @typescript-eslint/no-var-requires
       const clientManifest = require(clientManifestPath);
+      const bundleApp = this.getBundleApp(serverBundle);
+
+      this.app = eval(bundleApp)['default'];
 
       this.innerRenderer = createBundleRenderer(serverBundle, {
         clientManifest,
+        template,
         runInNewContext: false,
       })
     } catch(error) {
       throw error;
     }
+  }
+
+  private getBundleApp(serverBundle): string {
+    const entryFilename = serverBundle.entry;
+    const bundleFilenames =  Object.keys(serverBundle.files)
+
+    const findAppKey = bundleFilenames.find((item) => {
+      return item !== entryFilename;
+    })
+
+    if (findAppKey) {
+      return serverBundle.files[findAppKey];
+    }
+
+    return '{default: ""}';
   }
 }

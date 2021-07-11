@@ -3,8 +3,12 @@ import VueLoaderPlugin from 'vue-loader/lib/plugin';
 
 export interface ExternalConfig {
   mode: 'development' | 'production';
-  entry: string;
+  entry: {
+    app: string;
+    entry?: string
+  };
   dist: string;
+  publicPath: string,
   onProgress: (percentage: number, message?: string) => void;
   hmrPath?: string,
 }

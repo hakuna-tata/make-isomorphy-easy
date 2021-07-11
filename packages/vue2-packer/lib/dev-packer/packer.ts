@@ -21,7 +21,7 @@ const MIN_PORT = 50000;
 const MAX_PORT = 50999;
 const MIE_SSE_URL = '<!--mie_sse_url-->';
 const buildingHtml = readFileSync(join(__dirname, '../../template/building.html'), 'utf-8');
-const defalutTemplate = readFileSync(join(__dirname, '../../template/template.html'), 'utf-8');
+const defalutTemplate = readFileSync(join(__dirname, '../../template/default.html'), 'utf-8');
 
 export class Packer extends EventEmitter {
   private devServer: Koa;
@@ -54,8 +54,12 @@ export class Packer extends EventEmitter {
 
     this.serverConfig = getServerConfig(clone(base), {
       mode: 'development',
-      entry: join(__dirname, '../entry/server.js'),
+      entry: {
+        entry: join(__dirname, '../entry/server.js'),
+        app: join(pageDir, './App.vue'),
+      },
       dist: serverDist,
+      publicPath: this.route,
       onProgress: (percentage: number) => {
         if (percentage === 1) {
           this.buildDone('server');
@@ -65,14 +69,20 @@ export class Packer extends EventEmitter {
 
     this.serverConfig.plugins.push(
       new HtmlWebpackPlugin({
-        // templateContent: getServerTemplate(template || defalutTemplate, { isDev: true }),
+        templateContent: getServerTemplate(template || defalutTemplate, { isDev: true }),
+        inject: false,
+        filename: join(serverDist, './template.html'),
       })
     )
 
     this.clientConfig = getClientConfig(clone(base), {
       mode: 'development',
-      entry: join(__dirname, '../entry/client.js'),
+      entry: {
+        entry: join(__dirname, '../entry/client.js'),
+        app: join(pageDir, './App.vue'),
+      },
       dist: clientDist,
+      publicPath: this.route,
       hmrPath: this.hmrPath,
       onProgress: (percentage: number) => {
         if (percentage === 1) {

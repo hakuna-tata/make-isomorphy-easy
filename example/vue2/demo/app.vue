@@ -5,7 +5,7 @@
 <script>
 export default {
   data() {
-    return { demo: "demo page" };
+    return { demo: "demo page by fff" };
   },
 };
 </script>

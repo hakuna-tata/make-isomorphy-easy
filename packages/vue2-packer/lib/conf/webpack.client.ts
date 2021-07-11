@@ -11,12 +11,14 @@ export const getClientConfig = (base: WebpackOptions, options: ExternalConfig): 
     ...base,
     mode: options.mode,
     entry: {
-      app: options.entry,
+      entry: options.entry.entry,
+      app: options.entry.app,
     },
     devtool: isDev ? 'cheap-module-eval-source-map' : '',
     output: {
-      filename: isDev ? '[name].js' : '[name]/app.[contenthash:4].js',
+      filename: isDev ? 'client.[name].js' : 'client.app.[contenthash:4].js',
       path: options.dist,
+      publicPath: options.publicPath,
       library: 'mieApp',
       libraryTarget: 'umd2',
       libraryExport: 'default',

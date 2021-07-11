@@ -12,11 +12,13 @@ export const getServerConfig = (base: WebpackOptions, options: ExternalConfig): 
     target: 'node',
     mode: options.mode,
     entry: {
-      app: options.entry,
+      entry: options.entry.entry,
+      app: options.entry.app,
     },
     output: {
-      filename: isDev ? '[name].js' : '[name]/app.js',
+      filename: isDev ? 'server.[name].js' : 'server.app.[contenthash:4].js',
       path: options.dist,
+      publicPath: options.publicPath,
       libraryTarget: 'commonjs2',
     },
     externals: [nodeExternals(),],
