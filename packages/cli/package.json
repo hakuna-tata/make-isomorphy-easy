@@ -1,0 +1,22 @@
+{
+  "name": "@mie-js/cli",
+  "version": "0.0.0",
+  "description": "CLI of mie",
+  "keywords": [
+    "cli",
+    "mie",
+    "miejs"
+  ],
+  "author": "hakuna-tata <610578197@qq.com>",
+  "homepage": "https://github.com/hakuna-tata/make-isomorphy-easy#readme",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "lib"
+  ],
+  "scripts": {
+    "dev": "tsc --watch",
+    "build": "tsc"
+  }
+}
