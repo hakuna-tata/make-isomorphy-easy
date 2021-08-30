@@ -3,7 +3,7 @@ import { join } from 'path';
 import { PageConfig, MieOpts } from './mieTypes';
 
 // 保留目录名
-const preserveDirs = ['components', 'assets', 'layout', 'utils', 'static', 'services'];
+const preserveDirs = ['components', 'assets', 'utils', 'apis'];
 
 export const getPageConfig = (opts: MieOpts): Required<PageConfig>[] => {
   const pageConfigList: Required<PageConfig>[] = [];

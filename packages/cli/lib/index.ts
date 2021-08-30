@@ -1,7 +1,5 @@
-'use strict';
+#!/usr/bin/env node
 
-module.exports = cli;
+import cli from './cli';
 
-function cli() {
-    // TODO
-}
+cli();
